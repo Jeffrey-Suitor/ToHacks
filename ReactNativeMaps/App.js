@@ -10,47 +10,52 @@ import RestaurantComponent from './components/RestaurantComponent';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       search: '',
-      region: {},
+      region: {
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      },
     };
-    this.onRegionChange = this.onRegionChange.bind(this);
+
+    this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
     this.center_on_user = this.center_on_user.bind(this);
   }
 
-  componentDidMount(){
-    Radar.setUserId(userId);
+  componentDidMount() {
+    Radar.requestPermissions(true);
   }
 
   center_on_user() {
     console.log('this');
   }
 
-  onRegionChange(event) {
-    console.log(event);
+  onRegionChangeComplete(event) {
     this.setState({region: event});
   }
 
   updateSearch(event) {
-    console.log(event);
     this.setState({search: event});
+
+    Radar.getLocation().then((result) => {
+      console.log(result);
+    }).catch((err) => {
+      console.log(err);
+    });
   }
 
   render() {
-    const search = this.state.search;
     return (
       <View style={styles.fill_container}>
         <MapView
           style={styles.fill_container}
           region={this.state.region}
           onRegionChange={this.onRegionChange}
-          initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05
-          }}
+
           customMapStyle={my_map_style}
         />
 
@@ -58,7 +63,7 @@ export default class App extends React.Component {
           <SearchBar
             placeholder="Search"
             onChangeText={this.updateSearch}
-            value={search}
+            value={this.state.search}
             style={styles.fill_container}
           />
         </View>
@@ -81,8 +86,6 @@ const styles = {
     right: 10,
     left: 10,
     borderRadius: 50,
-    //borderColor: "red",
-    //borderWidth: 3,
     overflow: 'hidden',
   },
 };
