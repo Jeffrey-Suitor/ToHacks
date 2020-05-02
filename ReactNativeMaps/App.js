@@ -5,55 +5,77 @@ import MapView, {Marker} from 'react-native-maps';
 import Radar from 'react-native-radar';
 import my_map_style from './assets/map/map_style.json';
 import {SearchBar} from 'react-native-elements';
-import RestaurantComponent from "./components/RestaurantComponent"
+import RestaurantComponent from './components/RestaurantComponent';
 
 export default class App extends React.Component {
-  state = {
-    search: '',
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: '',
+      region: {},
+    };
+    this.onRegionChange = this.onRegionChange.bind(this);
+    this.updateSearch = this.updateSearch.bind(this);
+    this.center_on_user = this.center_on_user.bind(this);
+  }
 
-  updateSearch = search => {
-    this.setState({search});
-  };
+  componentDidMount(){
+    Radar.setUserId(userId);
+  }
+
+  center_on_user() {
+    console.log('this');
+  }
+
+  onRegionChange(event) {
+    console.log(event);
+    this.setState({region: event});
+  }
+
+  updateSearch(event) {
+    console.log(event);
+    this.setState({search: event});
+  }
 
   render() {
-    const {search} = this.state;
-    console.log(this.state)
+    const search = this.state.search;
     return (
-      <View style={styles.main_container}>
-
+      <View style={styles.fill_container}>
         <MapView
-          style={styles.main_container}
+          style={styles.fill_container}
+          region={this.state.region}
+          onRegionChange={this.onRegionChange}
           initialRegion={{
             latitude: 37.78825,
             longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05
           }}
           customMapStyle={my_map_style}
         />
 
-          <View style={styles.search_bar}>
+        <View style={styles.search_bar}>
           <SearchBar
-            placeholder="Type Here...asdsa"
+            placeholder="Search"
             onChangeText={this.updateSearch}
             value={search}
-            style={{flex: 1}}
+            style={styles.fill_container}
           />
         </View>
+
+        <RestaurantComponent />
       </View>
     );
   }
 }
 
 const styles = {
-  
-  main_container:{
+  fill_container: {
     flex: 1,
   },
 
   search_bar: {
-    position: "absolute",
+    position: 'absolute',
     flex: 1,
     top: 20,
     right: 10,
@@ -61,6 +83,6 @@ const styles = {
     borderRadius: 50,
     //borderColor: "red",
     //borderWidth: 3,
-    overflow: "hidden",
-  }
-}
+    overflow: 'hidden',
+  },
+};
