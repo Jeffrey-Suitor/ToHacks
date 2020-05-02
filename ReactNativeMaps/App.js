@@ -1,60 +1,66 @@
 /*This is an Example of React Native Map*/
 import React from 'react';
-import { StyleSheet, Text, View , TextInput} from 'react-native';
+import {StyleSheet, Text, View, TextInput} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Radar from 'react-native-radar';
+import my_map_style from './assets/map/map_style.json';
+import {SearchBar} from 'react-native-elements';
+import RestaurantComponent from "./components/RestaurantComponent"
 
-
- 
 export default class App extends React.Component {
-  onRegionChange(region) {
-    this.setState({ region });
-  }
+  state = {
+    search: '',
+  };
+
+  updateSearch = search => {
+    this.setState({search});
+  };
+
   render() {
-    var mapStyle=[{"elementType": "geometry", "stylers": [{"color": "#242f3e"}]},{"elementType": "labels.text.fill","stylers": [{"color": "#746855"}]},{"elementType": "labels.text.stroke","stylers": [{"color": "#242f3e"}]},{"featureType": "administrative.locality","elementType": "labels.text.fill","stylers": [{"color": "#d59563"}]},{"featureType": "poi","elementType": "labels.text.fill","stylers": [{"color": "#d59563"}]},{"featureType": "poi.park","elementType": "geometry","stylers": [{"color": "#263c3f"}]},{"featureType": "poi.park","elementType": "labels.text.fill","stylers": [{"color": "#6b9a76"}]},{"featureType": "road","elementType": "geometry","stylers": [{"color": "#38414e"}]},{"featureType": "road","elementType": "geometry.stroke","stylers": [{"color": "#212a37"}]},{"featureType": "road","elementType": "labels.text.fill","stylers": [{"color": "#9ca5b3"}]},{"featureType": "road.highway","elementType": "geometry","stylers": [{"color": "#746855"}]},{"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#1f2835"}]},{"featureType": "road.highway","elementType": "labels.text.fill","stylers": [{"color": "#f3d19c"}]},{"featureType": "transit","elementType": "geometry","stylers": [{"color": "#2f3948"}]},{"featureType": "transit.station","elementType": "labels.text.fill","stylers": [{"color": "#d59563"}]},{"featureType": "water","elementType": "geometry","stylers": [{"color": "#17263c"}]},{"featureType": "water","elementType": "labels.text.fill","stylers": [{"color": "#515c6d"}]},{"featureType": "water","elementType": "labels.text.stroke","stylers": [{"color": "#17263c"}]}];
+    const {search} = this.state;
+    console.log(this.state)
     return (
-      <View style={styles.container}>
+      <View style={styles.main_container}>
+
         <MapView
-          style={styles.map}
+          style={styles.main_container}
           initialRegion={{
             latitude: 37.78825,
             longitude: -122.4324,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
-          customMapStyle={mapStyle}
-        >
-          <Marker
-            draggable
-            coordinate={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-            }}
-            onDragEnd={(e) => alert(JSON.stringify(e.nativeEvent.coordinate))}
-            title={'Test Marker'}
-            description={'This is a description of the marker'}
+          customMapStyle={my_map_style}
+        />
+
+          <View style={styles.search_bar}>
+          <SearchBar
+            placeholder="Type Here...asdsa"
+            onChangeText={this.updateSearch}
+            value={search}
+            style={{flex: 1}}
           />
-        </MapView>
+        </View>
       </View>
     );
   }
 }
- 
-const styles = StyleSheet.create({
-  container: {
-    position:'absolute',
-    top:0,
-    left:0,
-    right:0,
-    bottom:0,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+
+const styles = {
+  
+  main_container:{
+    flex: 1,
   },
-  map: {
-    position:'absolute',
-    top:0,
-    left:0,
-    right:0,
-    bottom:0,
-  },
-});
+
+  search_bar: {
+    position: "absolute",
+    flex: 1,
+    top: 20,
+    right: 10,
+    left: 10,
+    borderRadius: 50,
+    //borderColor: "red",
+    //borderWidth: 3,
+    overflow: "hidden",
+  }
+}
