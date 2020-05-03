@@ -56,9 +56,18 @@ export default class App extends React.Component {
     this.setState({region: event});
   }
 
-  updateSearch(event) {
-    this.setState({search: event});
+  // pass tag to function, return list of relevant restaurants
+  updateSearch(event, tag) {
+  this.setState({search: event});
+  var result = [];
+  for(var i = 0; i < restaurant_data.length; i++){
+    if(restaurant_data[i].tags.includes(tag) || restaurant_data[i].name.includes(tag)){
+      result.push(restaurant_data[i]);
+    }
   }
+  return result;
+  // console.log(restaurant_data.length);
+}
 
   render() {
     return (
