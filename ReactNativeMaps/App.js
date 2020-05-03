@@ -11,7 +11,7 @@ import CheckRestaurantVisible from './components/CheckRestaurantVisible';
 import restaurant_data from './data/restaurants.json';
 
 import center_button_icon from './assets/icons/location.png';
-import search_icon from "./assets/icons/search.png"
+import search_icon from './assets/icons/search.png';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -26,11 +26,14 @@ export default class App extends React.Component {
         longitudeDelta: 0.05,
       },
       visible_count: 0,
+      search_active: false,
+      reset: false,
     };
 
     this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
     this.get_user_location = this.get_user_location.bind(this);
+    this.resetActive = this.resetActive.bind(this);
     Radar.requestPermissions(true);
     this.get_user_location();
   }
@@ -57,17 +60,26 @@ export default class App extends React.Component {
   }
 
   // pass tag to function, return list of relevant restaurants
-  updateSearch(event, tag) {
-  this.setState({search: event});
-  var result = [];
-  for(var i = 0; i < restaurant_data.length; i++){
-    if(restaurant_data[i].tags.includes(tag) || restaurant_data[i].name.includes(tag)){
-      result.push(restaurant_data[i]);
+  updateSearch(event) {
+    console.log(event);
+    if (event === '') {
+      this.setState({search: event, search_active: false});
+    } else {
+      this.setState({search: event, search_active: true});
+    }
+    this.resetActive();
+  }
+
+  resetActive() {
+    this.setState({reset: true});
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.reset === true && prevState.reset === false){
+      this.setState({reset: false});
+      this.onRegionChangeComplete(this.state.region);
     }
   }
-  return result;
-  // console.log(restaurant_data.length);
-}
 
   render() {
     return (
@@ -76,12 +88,37 @@ export default class App extends React.Component {
           style={styles.fill_container}
           region={this.state.region}
           onRegionChangeComplete={this.onRegionChangeComplete}
+          onPress={this.resetActive}
           customMapStyle={my_map_style}>
           {restaurant_data.map((item, index) => {
-            if (CheckRestaurantVisible(this.state.region, item)) {
-              this.state.visible_count = this.state.visible_count + 1;
-              if (this.state.visible_count < 8) {
-                return <RestaurantComponent item={item} key={index} />;
+            if (this.state.search_active === true) {
+              if (
+                item.tags.includes(this.state.search) ||
+                item.name.includes(this.state.search)
+              ) {
+                this.state.visible_count = this.state.visible_count + 1;
+                if (this.state.visible_count < 8) {
+                  return (
+                    <RestaurantComponent
+                      item={item}
+                      key={index}
+                      reset={this.state.reset}
+                    />
+                  );
+                }
+              }
+            } else {
+              if (CheckRestaurantVisible(this.state.region, item)) {
+                this.state.visible_count = this.state.visible_count + 1;
+                if (this.state.visible_count < 8) {
+                  return (
+                    <RestaurantComponent
+                      item={item}
+                      key={index}
+                      reset={this.state.reset}
+                    />
+                  );
+                }
               }
             }
           })}
@@ -129,8 +166,8 @@ const styles = {
     overflow: 'hidden',
     backgroundColor: 'white',
     justifyContent: 'space-between',
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   search: {

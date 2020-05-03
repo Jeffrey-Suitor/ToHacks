@@ -3,13 +3,13 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity,
-  Button,
   Linking,
   TouchableHighlight,
+  StyleSheet,
 } from 'react-native';
 import {Marker, Callout} from 'react-native-maps';
 import call from 'react-native-phone-call';
+import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
 import inactive_arrow from '../assets/icons/tag_inactive.png';
 import active_arrow from '../assets/icons/tag_active.png';
@@ -32,6 +32,9 @@ export default class RestaurantComponent extends React.Component {
     };
 
     this.toggleActive = this.toggleActive.bind(this);
+    if (this.props.reset === true) {
+      this.setState({active: false});
+    }
   }
 
   toggleActive() {
@@ -69,13 +72,14 @@ class ActiveRestaurantComponent extends React.Component {
     super(props);
 
     this.state = {
-      expanded: false
+      expanded: false,
     };
 
     this.placePhoneCall = this.placePhoneCall.bind(this);
     this.getDirections = this.getDirections.bind(this);
     this.getDelivery = this.getDelivery.bind(this);
     this.placeOrder = this.placeOrder.bind(this);
+    this.toggleExpand = this.toggleExpand.bind(this);
   }
 
   componentWillUnmount() {
@@ -101,12 +105,24 @@ class ActiveRestaurantComponent extends React.Component {
     Linking.openURL(url);
   }
 
+  toggleExpand() {
+    console.log('Toggling expand');
+    this.setState({expanded: !this.state.expanded});
+  }
+
   render() {
     return (
       <View style={styles.main_container}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.restaurant_name}>{this.props.item.name}</Text>
-          <Text style={{paddingTop: 10, paddingRight: 5}}>Expand</Text>
+          <Text
+            style={styles.restaurant_name}
+            {this.props.item.name}
+          </Text>
+          <Text
+            style={{paddingTop: 10, paddingRight: 5}}
+            onPress={this.toggleExpand}>
+            Expand
+          </Text>
         </View>
 
         <Text style={styles.restaurant_description}>
@@ -119,14 +135,14 @@ class ActiveRestaurantComponent extends React.Component {
             <Text
               style={{
                 flex: 1,
-                fontSize: 16,
+                fontSize: RFPercentage(1.5),
                 fontWeight: 'bold',
                 color: '#009353',
                 paddingLeft: 10,
               }}>{`Curbside\nPickup`}</Text>
             <TouchableHighlight
               style={{
-                borderRadius: 30,
+                borderRadius: 20,
                 backgroundColor: '#FF7A7A',
                 padding: 7,
                 zIndex: 3,
@@ -134,7 +150,9 @@ class ActiveRestaurantComponent extends React.Component {
               }}
               onPress={this.getDirections}
               underlayColor="blue">
-              <Text style={{color: 'white'}}>Take me there</Text>
+              <Text style={{color: 'white', fontSize: RFPercentage(2)}}>
+                Take me there
+              </Text>
             </TouchableHighlight>
           </View>
         )}
@@ -194,31 +212,30 @@ function parseBool(val) {
   return val === true || val === 'true' || val === 'TRUE';
 }
 
-const styles = {
+const styles = StyleSheet.create({
   fill_container: {
     flex: 1,
   },
 
   icon: {
-    height: 60,
-    width: 60,
+    height: 30,
+    width: 30,
     resizeMode: 'contain',
-    flex: 1
+    flex: 1,
   },
 
   main_container: {
+    position: 'absolute',
+    top: 0,
+    right: 20,
+    left: 20,
     backgroundColor: 'white',
-    zIndex: 2,
-    flex: 1,
     flexDirection: 'column',
-    padding: 10,
-    borderRadius: 30,
-    zIndex: 2,
   },
 
   restaurant_name: {
     flex: 1,
-    fontSize: 40,
+    fontSize: RFPercentage(4),
     padding: 5,
   },
 
@@ -232,6 +249,6 @@ const styles = {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingBottom: 15,
   },
-};
+});
