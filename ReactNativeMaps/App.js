@@ -83,9 +83,13 @@ export default class App extends React.Component {
             placeholder="Search"
             onChangeText={this.updateSearch}
             value={this.state.search}
-            style={styles.fill_container}
+            placeholderTextColor="black"
+            searchIcon={null}
+            inputContainerStyle={styles.search}
+            containerStyle={{backgroundColor: "white"}}
           />
         </View>
+
         <View style={styles.center_icon}>
           <TouchableOpacity
             style={styles.fill_container}
@@ -107,23 +111,36 @@ const styles = {
   search_bar: {
     position: 'absolute',
     flex: 1,
-    top: 20,
-    right: 10,
-    left: 10,
+    left: 60,
+    right: 60,
+    top: 30,
     borderRadius: 50,
     overflow: 'hidden',
+    backgroundColor: 'white',
+    width: 290,
+  },
+
+  search: {
+    borderRadius: 50,
+    backgroundColor: 'white',
+    height: 25,
+    width: 290,
   },
 
   ImageIconStyle: {
     flex: 1,
     resizeMode: 'contain',
+    width: 45,
   },
 
   center_icon: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 15,
     right: 10,
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
+    backgroundColor: 'white',
+    borderRadius: 50,
+    alignItems: 'center'
   },
 };
