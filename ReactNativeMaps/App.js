@@ -1,6 +1,6 @@
 /*This is an Example of React Native Map*/
 import React from 'react';
-import {View, TouchableOpacity, Image, Icon} from 'react-native';
+import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Radar from 'react-native-radar';
 import my_map_style from './assets/map/map_style.json';
@@ -12,6 +12,10 @@ import restaurant_data from './data/restaurants.json';
 
 import center_button_icon from './assets/icons/location.png';
 import search_icon from './assets/icons/search.png';
+
+import inactive_arrow from './assets/icons/tag_inactive.png';
+import active_arrow from './assets/icons/tag_active.png';
+import ActiveRestaurantComponent from './components/RestaurantComponent';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -27,13 +31,14 @@ export default class App extends React.Component {
       },
       visible_count: 0,
       search_active: false,
-      reset: false,
+      active_restaurant: false,
     };
 
     this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
     this.get_user_location = this.get_user_location.bind(this);
-    this.resetActive = this.resetActive.bind(this);
+    this.activateRestaurant = this.activateRestaurant.bind(this);
+    this.deactivateRestaurant = this.deactivateRestaurant.bind(this);
     Radar.requestPermissions(true);
     this.get_user_location();
   }
@@ -64,20 +69,34 @@ export default class App extends React.Component {
     console.log(event);
     if (event === '') {
       this.setState({search: event, search_active: false});
+      this.deactivateRestaurant();
     } else {
       this.setState({search: event, search_active: true});
     }
-    this.resetActive();
   }
 
-  resetActive() {
-    this.setState({reset: true});
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.reset === true && prevState.reset === false){
-      this.setState({reset: false});
+  deactivateRestaurant() {
+    if (this.state.active_restaurant !== false) {
+      this.state.active_restaurant.image = {inactive_arrow};
+      this.setState({active_restaurant: false});
       this.onRegionChangeComplete(this.state.region);
+    }
+  }
+
+  activateRestaurant(event) {
+    console.log(event.nativeEvent);
+    for (var i = 0; i < restaurant_data.length; i++) {
+      if (
+        event.nativeEvent.coordinate.longitude ===
+        parseFloat(restaurant_data[i].Longitude)
+      ) {
+        if (
+          event.nativeEvent.coordinate.latitude ===
+          parseFloat(restaurant_data[i].Latitude)
+        ) {
+          this.setState({active_restaurant: restaurant_data[i]});
+        }
+      }
     }
   }
 
@@ -88,21 +107,38 @@ export default class App extends React.Component {
           style={styles.fill_container}
           region={this.state.region}
           onRegionChangeComplete={this.onRegionChangeComplete}
-          onPress={this.resetActive}
+          onPress={this.deactivateRestaurant}
           customMapStyle={my_map_style}>
           {restaurant_data.map((item, index) => {
-            if (this.state.search_active === true) {
+            if (item === this.state.active_restaurant) {
+              this.state.visible_count = this.state.visible_count + 1;
+              return (
+                <Marker
+                  coordinate={{
+                    latitude: parseFloat(item.Latitude),
+                    longitude: parseFloat(item.Longitude),
+                  }}
+                  image={active_arrow}
+                  onPress={this.activateRestaurant}
+                  key={index}
+                />
+              );
+            } else if (this.state.search_active === true) {
               if (
                 item.tags.includes(this.state.search) ||
                 item.name.includes(this.state.search)
               ) {
                 this.state.visible_count = this.state.visible_count + 1;
-                if (this.state.visible_count < 8) {
+                if (this.state.visible_count < 12) {
                   return (
-                    <RestaurantComponent
-                      item={item}
+                    <Marker
+                      coordinate={{
+                        latitude: parseFloat(item.Latitude),
+                        longitude: parseFloat(item.Longitude),
+                      }}
+                      image={inactive_arrow}
+                      onPress={this.activateRestaurant}
                       key={index}
-                      reset={this.state.reset}
                     />
                   );
                 }
@@ -110,12 +146,16 @@ export default class App extends React.Component {
             } else {
               if (CheckRestaurantVisible(this.state.region, item)) {
                 this.state.visible_count = this.state.visible_count + 1;
-                if (this.state.visible_count < 8) {
+                if (this.state.visible_count < 12) {
                   return (
-                    <RestaurantComponent
-                      item={item}
+                    <Marker
+                      coordinate={{
+                        latitude: parseFloat(item.Latitude),
+                        longitude: parseFloat(item.Longitude),
+                      }}
+                      image={inactive_arrow}
+                      onPress={this.activateRestaurant}
                       key={index}
-                      reset={this.state.reset}
                     />
                   );
                 }
@@ -123,6 +163,14 @@ export default class App extends React.Component {
             }
           })}
         </MapView>
+        {this.state.active_restaurant !== false && (
+          <View style={styles.restaurant_popup}>
+            <ActiveRestaurantComponent
+              restaurant={this.state.active_restaurant}
+              style={{padding: 20, backgroundColor: 'white'}}
+            />
+          </View>
+        )}
 
         <View style={styles.search_bar}>
           <SearchBar
@@ -149,7 +197,7 @@ export default class App extends React.Component {
   }
 }
 
-const styles = {
+const styles = StyleSheet.create({
   fill_container: {
     flex: 1,
     justifyContent: 'center',
@@ -193,4 +241,16 @@ const styles = {
     borderRadius: 50,
     alignItems: 'center',
   },
-};
+
+  restaurant_popup: {
+    position: 'absolute',
+    left: '10%',
+    right: '10%',
+    top: '12%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+});
