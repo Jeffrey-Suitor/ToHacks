@@ -24,10 +24,23 @@ export default class App extends React.Component {
     this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
     this.center_on_user = this.center_on_user.bind(this);
-  }
-
-  componentDidMount() {
     Radar.requestPermissions(true);
+
+    Radar.getLocation()
+      .then(result => {
+        this.setState({
+          region: {
+            latitude: result.location.latitude,
+            longitude: result.location.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+        });
+        console.log(this.state.region);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 
   center_on_user() {
@@ -40,12 +53,6 @@ export default class App extends React.Component {
 
   updateSearch(event) {
     this.setState({search: event});
-
-    Radar.getLocation().then((result) => {
-      console.log(result);
-    }).catch((err) => {
-      console.log(err);
-    });
   }
 
   render() {
@@ -54,8 +61,7 @@ export default class App extends React.Component {
         <MapView
           style={styles.fill_container}
           region={this.state.region}
-          onRegionChange={this.onRegionChange}
-
+          onRegionChangeComplete={this.onRegionChangeComplete}
           customMapStyle={my_map_style}
         />
 
