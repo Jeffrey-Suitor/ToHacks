@@ -1,11 +1,12 @@
 /*This is an Example of React Native Map*/
 import React from 'react';
-import {StyleSheet, Text, View, TextInput} from 'react-native';
+import {StyleSheet, Text, View, TextInput, TouchableWithoutFeedbackBase} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Radar from 'react-native-radar';
 import my_map_style from './assets/map/map_style.json';
 import {SearchBar} from 'react-native-elements';
 import RestaurantComponent from './components/RestaurantComponent';
+import AvailableRestaurants from "./components/AvailableRestaurantsComponent"
 
 export default class App extends React.Component {
   constructor(props) {
@@ -23,28 +24,29 @@ export default class App extends React.Component {
 
     this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
-    this.center_on_user = this.center_on_user.bind(this);
+    this.get_user_location = this.get_user_location.bind(this);
     Radar.requestPermissions(true);
-
-    Radar.getLocation()
-      .then(result => {
-        this.setState({
-          region: {
-            latitude: result.location.latitude,
-            longitude: result.location.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          },
-        });
-        console.log(this.state.region);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    this.get_user_location();
   }
 
-  center_on_user() {
-    console.log('this');
+
+  async get_user_location() {
+    await Radar.getLocation(key, index)
+    .then(result => {
+      this.setState({
+        region: {
+          latitude: result.location.latitude,
+          longitude: result.location.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+      });
+      console.log(this.state.region);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
   }
 
   onRegionChangeComplete(event) {
@@ -53,6 +55,7 @@ export default class App extends React.Component {
 
   updateSearch(event) {
     this.setState({search: event});
+    console.log(restaurant_data.length)
   }
 
   render() {
@@ -64,6 +67,13 @@ export default class App extends React.Component {
           onRegionChangeComplete={this.onRegionChangeComplete}
           customMapStyle={my_map_style}
         />
+
+      <View>
+          <AvailableRestaurants
+            region={this.state.region}
+            style={styles.fill_container}
+          />
+        </View>
 
         <View style={styles.search_bar}>
           <SearchBar
