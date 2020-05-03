@@ -24,11 +24,15 @@ export default function CheckRestaurantVisible(region, item) {
     if (longtitude_min <= longitude && item.Longitude <= longtitude_max) {
       //console.log("+ longitude", longtitude_min, item.Longitude, longtitude_max)
       longitude_flag = true;
+    } else {
+      return false;
     }
   } else {
     if (longtitude_min >= longitude && item.Longitude >= longtitude_max) {
       //console.log("- longitude", longtitude_min, item.Longitude, longtitude_max)
       longitude_flag = true;
+    } else {
+      return false;
     }
   }
 
@@ -36,11 +40,15 @@ export default function CheckRestaurantVisible(region, item) {
     if (latitude_min <= latitude && latitude <= latitude_max) {
       //console.log("+ latitude", latitude_min, item.Latitude, latitude_max)
       latitude_flag = true;
+    } else {
+      return false;
     }
   } else {
     if (latitude_min >= latitude && latitude >= latitude_max) {
       //console.log("- latitude", latitude_min, item.Latitude, latitude_max)
       latitude_flag = true;
+    } else {
+      return false;
     }
   }
 
