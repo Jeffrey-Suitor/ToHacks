@@ -11,6 +11,7 @@ import CheckRestaurantVisible from './components/CheckRestaurantVisible';
 import restaurant_data from './data/restaurants.json';
 
 import center_button_icon from './assets/icons/location.png';
+import search_icon from "./assets/icons/search.png"
 
 export default class App extends React.Component {
   constructor(props) {
@@ -57,7 +58,6 @@ export default class App extends React.Component {
 
   updateSearch(event) {
     this.setState({search: event});
-    console.log(restaurant_data.length);
   }
 
   render() {
@@ -86,7 +86,7 @@ export default class App extends React.Component {
             placeholderTextColor="black"
             searchIcon={null}
             inputContainerStyle={styles.search}
-            containerStyle={{backgroundColor: "white"}}
+            containerStyle={{backgroundColor: 'white'}}
           />
         </View>
 
@@ -106,6 +106,8 @@ export default class App extends React.Component {
 const styles = {
   fill_container: {
     flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
   },
 
   search_bar: {
@@ -117,7 +119,9 @@ const styles = {
     borderRadius: 50,
     overflow: 'hidden',
     backgroundColor: 'white',
-    width: 290,
+    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center"
   },
 
   search: {
@@ -141,6 +145,6 @@ const styles = {
     height: 70,
     backgroundColor: 'white',
     borderRadius: 50,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 };

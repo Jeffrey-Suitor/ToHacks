@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Button,
   Linking,
+  TouchableHighlight,
 } from 'react-native';
 import {Marker, Callout} from 'react-native-maps';
 import call from 'react-native-phone-call';
@@ -68,7 +69,7 @@ class ActiveRestaurantComponent extends React.Component {
     super(props);
 
     this.state = {
-      active: false,
+      expanded: false
     };
 
     this.placePhoneCall = this.placePhoneCall.bind(this);
@@ -102,27 +103,54 @@ class ActiveRestaurantComponent extends React.Component {
 
   render() {
     return (
-      <View
-        style={styles.main_container}>
-        <Text style={styles.restaurant_name}>{this.props.item.name}</Text>
-        <Text style={styles.restaurant_description}>{this.props.item.description}</Text>
-        <Text>Expand</Text>
+      <View style={styles.main_container}>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.restaurant_name}>{this.props.item.name}</Text>
+          <Text style={{paddingTop: 10, paddingRight: 5}}>Expand</Text>
+        </View>
+
+        <Text style={styles.restaurant_description}>
+          {this.props.item.description}
+        </Text>
+
         {parseBool(this.props.item['Curbside Pickup']) === true && (
-          <View style={styles.inline} onPress={console.log("asdsadsadas")}>
+          <View style={styles.inline}>
             <Image source={curbside} style={styles.icon} />
-            <Text style={{flex:1}}>{`Curbside\nPickup`}</Text>
-            <Button title="Take me there" onPress={this.getDirections} style={{flex:3}}/>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: '#009353',
+                paddingLeft: 10,
+              }}>{`Curbside\nPickup`}</Text>
+            <TouchableHighlight
+              style={{
+                borderRadius: 30,
+                backgroundColor: '#FF7A7A',
+                padding: 7,
+                zIndex: 3,
+                elevate: 3,
+              }}
+              onPress={this.getDirections}
+              underlayColor="blue">
+              <Text style={{color: 'white'}}>Take me there</Text>
+            </TouchableHighlight>
           </View>
         )}
         {parseInt(this.props.item['In-House Delivery']) === true && (
-          <View onPress={console.log("asdsadasda")}>
+          <View>
             <Image source={delivery} style={styles.icon} />
             <Text>{`Mobile\nPOrder`}</Text>
-            <Button title="Order online" onPress={this.getDelivery} style={{flex:3}}/>
+            <TouchableHighlight
+              style={{borderRadius: 30}}
+              onPress={this.getDelivery}>
+              <Text style={{padding: 20}}>Order Online</Text>
+            </TouchableHighlight>
           </View>
         )}
 
-        <View>
+        <View style={styles.inline}>
           {this.props.item.SkipTheDishes !== '' && (
             <Image
               source={skip_the_dishes}
@@ -147,16 +175,16 @@ class ActiveRestaurantComponent extends React.Component {
               value={this.props.item.UberEats}
             />
           )}
-        </View>
 
-        {parseInt(this.props.item.phone.split('.').join('')) !== NaN && (
-          <Image
-            source={phone}
-            style={styles.icon}
-            onPress={this.placePhoneCall}
-            value={parseInt(this.props.item.phone.split('.').join(''))}
-          />
-        )}
+          {parseInt(this.props.item.phone.split('.').join('')) !== NaN && (
+            <Image
+              source={phone}
+              style={styles.icon}
+              onPress={this.placePhoneCall}
+              value={parseInt(this.props.item.phone.split('.').join(''))}
+            />
+          )}
+        </View>
       </View>
     );
   }
@@ -169,34 +197,41 @@ function parseBool(val) {
 const styles = {
   fill_container: {
     flex: 1,
-    backgroundColor: 'red',
   },
 
   icon: {
-    flex: 1,
     height: 60,
     width: 60,
     resizeMode: 'contain',
+    flex: 1
   },
 
   main_container: {
-    backgroundColor: 'white', 
+    backgroundColor: 'white',
     zIndex: 2,
     flex: 1,
-    flexDirection: "column" ,
+    flexDirection: 'column',
+    padding: 10,
+    borderRadius: 30,
+    zIndex: 2,
   },
 
   restaurant_name: {
-    flex:1,
-    fontSize: 45,
+    flex: 1,
+    fontSize: 40,
+    padding: 5,
   },
 
   restaurant_description: {
-    flex:1,
+    flex: 1,
+    padding: 5,
+    paddingBottom: 20,
   },
 
   inline: {
-      flexDirection: 'row',
-      backgroundColor: "red"
-  }
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
 };
