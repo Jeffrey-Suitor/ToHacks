@@ -1,12 +1,19 @@
 /*This is an Example of React Native Map*/
 import React from 'react';
-import {StyleSheet, Text, View, TextInput, TouchableWithoutFeedbackBase} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableWithoutFeedbackBase,
+} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Radar from 'react-native-radar';
 import my_map_style from './assets/map/map_style.json';
 import {SearchBar} from 'react-native-elements';
 import RestaurantComponent from './components/RestaurantComponent';
-import AvailableRestaurants from "./components/AvailableRestaurantsComponent"
+import CheckRestaurantVisible from './components/CheckRestaurantVisible';
+import restaurant_data from './data/restaurants.json';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -29,24 +36,22 @@ export default class App extends React.Component {
     this.get_user_location();
   }
 
-
   async get_user_location() {
     await Radar.getLocation(key, index)
-    .then(result => {
-      this.setState({
-        region: {
-          latitude: result.location.latitude,
-          longitude: result.location.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        },
+      .then(result => {
+        this.setState({
+          region: {
+            latitude: result.location.latitude,
+            longitude: result.location.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+        });
+        console.log(this.state.region);
+      })
+      .catch(err => {
+        console.log(err);
       });
-      console.log(this.state.region);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-
   }
 
   onRegionChangeComplete(event) {
@@ -55,7 +60,7 @@ export default class App extends React.Component {
 
   updateSearch(event) {
     this.setState({search: event});
-    console.log(restaurant_data.length)
+    console.log(restaurant_data.length);
   }
 
   render() {
@@ -65,15 +70,21 @@ export default class App extends React.Component {
           style={styles.fill_container}
           region={this.state.region}
           onRegionChangeComplete={this.onRegionChangeComplete}
-          customMapStyle={my_map_style}
-        />
-
-      <View>
-          <AvailableRestaurants
-            region={this.state.region}
-            style={styles.fill_container}
-          />
-        </View>
+          customMapStyle={my_map_style}>
+          {restaurant_data.map(item => {
+            if (CheckRestaurantVisible(this.state.region, item)) {
+              console.log('aslkdjlaskdjlkasj');
+              return (
+                <Marker
+                  coordinate={{
+                    latitude: parseFloat(item.Latitude),
+                    longitude: parseFloat(item.Longitude),
+                  }}
+                />
+              );
+            }
+          })}
+        </MapView>
 
         <View style={styles.search_bar}>
           <SearchBar
